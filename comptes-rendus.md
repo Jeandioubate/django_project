@@ -81,3 +81,11 @@ class ChoiceAdmin(admin.ModelAdmin):
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice, ChoiceAdmin)
 ```
+#### 5. En ajoutant un nouvel utilisateur via l'interface admin, sans lui attribuer le statut "équipe" ou "super-utilisateur". En se déconnectant et essayant une nouvelle connexion avec le nouvel user, on rencontre ce message :
+" Veuillez compléter correctement les champs (nom d'utilisateur) et (mot de passe) d'un compte autorisé. Sachez que les deux champs peuvent être sensibles à la casse." Par conséquent on ne peut pas se connecter avec le nouvel user.
+#### 6. Reconnectez-vous avec l'admin (super-utilisateur) et faites en sorte que l'user puisse se connecter à l'interface admin. Profitez-en pour changer son mot de passe.
+Pour que le nouvel user puisse se connecter via l'interface admin, il faut lui attribuer le statut "équipe" et le sauvegarder. 
+Quant au mot de passe, il faut une réinitialisation pour le changer.
+#### 7. L'utilisateur ayant quitté l'organisation, cherchez maintenant à désactiver son compte plutôt que de le supprimer. Vérifiez qu'il ne peut plus se connecter.
+Pour désactiver un utilisateur, il faut décocher la case "Active" dans les permissions de la fiche de l'utilisateur et sauvegarder.
+L'utilisateur ne peut plus se connecter et le message affiché par l'interface est le même qu'à la question 5.
