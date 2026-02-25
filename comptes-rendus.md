@@ -89,3 +89,21 @@ Quant au mot de passe, il faut une réinitialisation pour le changer.
 #### 7. L'utilisateur ayant quitté l'organisation, cherchez maintenant à désactiver son compte plutôt que de le supprimer. Vérifiez qu'il ne peut plus se connecter.
 Pour désactiver un utilisateur, il faut décocher la case "Active" dans les permissions de la fiche de l'utilisateur et sauvegarder.
 L'utilisateur ne peut plus se connecter et le message affiché par l'interface est le même qu'à la question 5.
+
+## 2.2.2 Exercice shell
+### 2.2.2.1 Préambule
+* Ouvrir un terminal
+* Aller dans le répertoire du projet
+* Lancez le *shell* Django ($ python manage.py shell)
+### 2.2.2.2 Questions
+#### 1. Lister tous les objets de type Question : faites une boucle pour afficher les attributs de chaque question sur une ligne différente.
+```
+>>> for q in Question.objects.all():    
+...     q.id, q.question_text, q.pub_date
+```
+#### 2. Ajoutez un filtre sur la date de publication-portant par ex. sur un de ses composants suivant : *year, month, day* - de vos questions et lister un sous-ensemble de vos questions suivant les dates que vous avez saisies à l'exo précédent.
+```
+>>> from django.utils import timezone
+>>> current_day = timezone.now().day
+>>> Question.objects.filter(pub_date__day=current_day)
+```
