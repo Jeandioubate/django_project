@@ -107,3 +107,16 @@ L'utilisateur ne peut plus se connecter et le message affiché par l'interface e
 >>> current_day = timezone.now().day
 >>> Question.objects.filter(pub_date__day=current_day)
 ```
+#### 3. Trouver la deuxième question (pour laquelle l'attribut de clé primaire id=2) de votre base de données, puis affichez les valeurs de tous ses attributs et tous les choix associés.
+```
+>>> q = Question.objects.get(id=2)
+>>> q.id, q.question_text, q.pub_date
+>>> q.choice_set.all()
+```
+#### 4. Faites une boucle pour afficher les attributs de chaque question leurs choix associés.
+```
+>>> for q in Question.objects.all():
+...     q.id, q.question_text, q.pub_date
+...     for c in q.choice_set.all():
+...         c.choice_text, c.votes
+```
