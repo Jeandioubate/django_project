@@ -120,3 +120,39 @@ L'utilisateur ne peut plus se connecter et le message affiché par l'interface e
 ...     for c in q.choice_set.all():
 ...         c.choice_text, c.votes
 ```
+#### 5. Affichez le nombre de choix enregistrés pour chaque question.
+```
+>>> for q in Question.objects.all():
+...     q, q.choice_set.count()
+```
+#### 6. [optionnel] Cherchez toutes les questions triées par le nombre de votes à chaque choix, en utilisant la méthode <ins>*order by()*</ins> – la méthode <ins>*values()*</ins> peut également être utilisée pour obtenir un affichage plus complet des questions. Essayer d'utiliser <ins>Recherches traversant les relations</ins> pour obtenir une solution la plus synthétique possible.
+```
+>>> for c in Choice.objects.all().order_by('votes'):
+...     c.question.question_text, c.choice_text, c.votes
+>>> for q in 
+Question.objects.all().order_by('choice__votes').values('question_
+text', 'choice__choice_text', 'choice__votes'):
+...     q
+>>> for c in 
+Choice.objects.all().order_by('votes').values('question__question_
+text', 'choice_text', 'votes'):
+...     c
+```
+#### 7. Triez les questions par ordre antéchronologique.
+```
+>>> Question.objects.all().order_by('-pub_date')
+```
+#### 8. [optionnel] Cherchez toutes les questions dont un mot est présent dans le texte de ses choix, en utilisant la recherche <ins>*contains*</ins>. <ins>Recherches traversant les relations</ins> permet de bien comprendre la 3e solution proposée ci-après (qui est plutôt celle attendue avec Django) :
+```
+>>> for q in Question.objects.all():
+...     for c in q.choice_set.all():
+...         if 'Non' in c.choice_text:
+...             print(q, c.choice_text)
+...             break
+
+>>> for q in Question.objects.all():
+...     if any(map(lambda c: 'Non' in c.choice_text, 
+q.choice_set.all())):
+...         q, q.choice_set.all()
+>>> Question.objects.filter(choice__choice_text__contains='Non')
+```
