@@ -156,3 +156,32 @@ q.choice_set.all())):
 ...         q, q.choice_set.all()
 >>> Question.objects.filter(choice__choice_text__contains='Non')
 ```
+#### 9. Créez une question en le shell.
+```
+>>> q = Question(question_text="Quelle est la couleur du cheval 
+blanc d'Henri IV ?", pub_date=timezone.now())
+>>> q.save()
+>>> q.id # pour vérifier que la question a bien été rajoutée dans 
+la base
+```
+#### 10. Ajoutez 3 choix à cette question en utilisant le shell.
+```
+>>> q.choice_set.create(choice_text="Blanc", votes=0)
+>>> q.choice_set.create(choice_text="Noir", votes=0)
+>>> q.choice_set.create(choice_text="Gris clair", votes=0)
+```
+#### 11. Listez les questions publiées récemment.
+```
+>>> for q in Question.objects.all():
+...     if q.was_published_recently():
+...         q
+ou avec une compréhension de liste :
+>>> [q for q in Question.objects.all() if 
+q.was_published_recently()]
+```
+#### 12. [optionnel] Listez tous les utilisateurs enregistrés sur l'application, en s'inspirant de <ins>Utilisation du système d’authentification de Django</ins> > <ins>Création d'utilisateurs</ins> pour accéder à tous les objets de la classe User (s'inspirer également du code de la Q1).
+```
+>>> from django.contrib.auth.models import User
+>>> User.objects.all()
+```
+
