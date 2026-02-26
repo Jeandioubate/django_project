@@ -432,3 +432,67 @@ urlpatterns = [
 
 <p><a href="{% url 'polls:all' %}">Retour à la liste des sondages</a></p>
 ```
+#### 5. Ajoutez un formulaire - accessible par un lien depuis la page http://127.0.0.1:8000/polls/ – qui permette de créer une question.
+
+#### a. Créer un nouveau fichier polls/forms.py
+```
+from django import forms
+from .models import Question
+
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ['question_text', 'pub_date']
+```
+#### b. Ajouter la vue create_question dans polls/views.py
+```
+def create_question(request):
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('polls:index')
+    else:
+        form = QuestionForm()
+
+    return render(request, 'polls/create_question.html', {'form': form})
+```
+#### c. Ajouter l'URL create dans polls/urls.py
+```
+from django.urls import path
+
+from . import views
+
+app_name = "polls"
+urlpatterns = [
+    path("", views.IndexView.as_view(), name="index"),
+    path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+    path("<int:pk>/results/", views.ResultsView.as_view(), name="results"),
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+    path('all/', views.all_polls, name='all'),
+    path('<int:question_id>/frequency/', views.frequency, name='frequency'),
+    path('statistics/', views.statistics, name='statistics'),
+    path('create/', views.create_question, name='create'),
+]
+```
+#### d. Créer un template create_question.html
+```
+<h1>Créer une nouvelle question</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Créer</button>
+</form>
+
+<p><a href="{% url 'polls:index' %}">Retour aux sondages</a></p>
+```
+#### e. Ajouter le lien 'polls:create' dans polls/index.html
+```
+<p>
+   <a href="{% url 'polls:create' %}">
+      ➕ Ajouter une nouvelle question
+   </a>
+</p>
+```
