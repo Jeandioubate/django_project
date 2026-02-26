@@ -3,6 +3,7 @@ import datetime
 
 from django.utils import timezone
 from django.db import models
+from django.db.models import Sum, Max, Min
 
 
 class Question(models.Model):
@@ -14,6 +15,17 @@ class Question(models.Model):
 
     def was_published_recently(self):
         return self.pub_date >= timezone.now() - datetime.timedelta(days=1)
+
+    def total_votes(self):
+        return self.choice_set.aggregate(total=Sum('votes'))['total'] or 0
+
+    @classmethod
+    def most_popular(cls):
+        return max(cls.objects.all(), key=lambda q: q.total_votes(), default=None)
+
+    @classmethod
+    def least_popular(cls):
+        return min(cls.objects.all(), key=lambda q: q.total_votes(), default=None)
 
 
 class Choice(models.Model):
