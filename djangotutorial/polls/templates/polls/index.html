@@ -7,9 +7,17 @@
             <a href="{% url 'polls:detail' question.id %}">
                 {{ question.question_text }}
             </a>
-            <small>(publié le {{ question.pub_date|date:"d/m/Y à H:i" }})</small></li>
+            <small>(publié le {{ question.pub_date|date:"d/m/Y à H:i" }})</small>
+
+        </li>
     {% endfor %}
     </ul>
 {% else %}
     <p>No polls are available.</p>
 {% endif %}
+
+<p>
+   <a href="{% url 'polls:create' %}">
+      ➕ Ajouter une nouvelle question
+   </a>
+</p>
