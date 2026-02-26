@@ -4,6 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse
+from django.db.models import Sum, Max
 
 from .models import Question, Choice
 # Create your views here.
@@ -14,7 +15,7 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return the last five published questions."""
-        return Question.objects.order_by("-pub_date")[:5]
+        return Question.objects.order_by("-pub_date")[:6]
 
 
 class DetailView(generic.DetailView):
@@ -75,3 +76,33 @@ def frequency(request, question_id):
         'total_votes': total_votes,
     }
     return render(request, 'polls/frequency.html', context)
+
+def statistics(request):
+    total_questions = Question.objects.count()
+    total_choices = Choice.objects.count()
+    total_votes = Choice.objects.aggregate(total=Sum('votes'))['total'] or 0
+
+    average_votes = (
+        total_votes / total_questions if total_questions > 0 else 0
+    )
+
+    most_popular = Question.most_popular()
+    least_popular = Question.least_popular()
+
+    last_question = Question.objects.aggregate(
+        last_date=Max('pub_date')
+    )
+    last_question = Question.objects.filter(
+        pub_date=last_question['last_date']
+    ).first()
+
+    context = {
+        'total_questions': total_questions,
+        'total_choices': total_choices,
+        'total_votes': total_votes,
+        'average_votes': average_votes,
+        'most_popular': most_popular,
+        'least_popular': least_popular,
+        'last_question': last_question,
+    }
+    return render(request, 'polls/statistics.html', context)
