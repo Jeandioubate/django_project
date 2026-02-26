@@ -329,3 +329,106 @@ par:
 ```
 <a href="{% url 'polls:frequency' question.id %}">
 ```
+#### 4. Ajoutez une page de statistiques http://127.0.0.1:8000/polls/statistics/ affichant diverses fonctionnalités :
+#### a. Implémenter les méthodes de classe dans polls/models.py
+```
+    def total_votes(self):
+        return self.choice_set.aggregate(total=Sum('votes'))['total'] or 0
+
+    @classmethod
+    def most_popular(cls):
+        return max(cls.objects.all(), key=lambda q: q.total_votes(), default=None)
+
+    @classmethod
+    def least_popular(cls):
+        return min(cls.objects.all(), key=lambda q: q.total_votes(), default=None)
+```
+#### b. Ajouter la vue statistics dans polls/views.py
+```
+def statistics(request):
+    total_questions = Question.objects.count()
+    total_choices = Choice.objects.count()
+    total_votes = Choice.objects.aggregate(total=Sum('votes'))['total'] or 0
+
+    average_votes = (
+        total_votes / total_questions if total_questions > 0 else 0
+    )
+
+    most_popular = Question.most_popular()
+    least_popular = Question.least_popular()
+
+    last_question = Question.objects.aggregate(
+        last_date=Max('pub_date')
+    )
+    last_question = Question.objects.filter(
+        pub_date=last_question['last_date']
+    ).first()
+
+    context = {
+        'total_questions': total_questions,
+        'total_choices': total_choices,
+        'total_votes': total_votes,
+        'average_votes': average_votes,
+        'most_popular': most_popular,
+        'least_popular': least_popular,
+        'last_question': last_question,
+    }
+    return render(request, 'polls/statistics.html', context)
+```
+#### c. Ajouter l'URL statistics dans polls/urls.py
+```
+from django.urls import path
+
+from . import views
+
+app_name = "polls"
+urlpatterns = [
+    path("", views.IndexView.as_view(), name="index"),
+    path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+    path("<int:pk>/results/", views.ResultsView.as_view(), name="results"),
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+    path('all/', views.all_polls, name='all'),
+    path('<int:question_id>/frequency/', views.frequency, name='frequency'),
+    path('statistics/', views.statistics, name='statistics'),
+]
+```
+#### d. Créer le template statistics.html
+```
+<h1>Statistiques des sondages</h1>
+
+<ul>
+    <li>Nombre total de sondages : {{ total_questions }}</li>
+    <li>Nombre total de choix : {{ total_choices }}</li>
+    <li>Nombre total de votes : {{ total_votes }}</li>
+    <li>Moyenne de votes par sondage : {{ average_votes|floatformat:2 }}</li>
+</ul>
+
+<h2>Popularité</h2>
+<ul>
+    <li>
+        Question la plus populaire :
+        {% if most_popular %}
+            {{ most_popular.question_text }} ({{ most_popular.total_votes }} votes)
+        {% else %}
+            Aucune
+        {% endif %}
+    </li>
+    <li>
+        Question la moins populaire :
+        {% if least_popular %}
+            {{ least_popular.question_text }} ({{ least_popular.total_votes }} votes)
+        {% else %}
+            Aucune
+        {% endif %}
+    </li>
+</ul>
+
+<h2>Dernière question enregistrée</h2>
+{% if last_question %}
+    <p>{{ last_question.question_text }} — {{ last_question.pub_date }}</p>
+{% else %}
+    <p>Aucune question enregistrée.</p>
+{% endif %}
+
+<p><a href="{% url 'polls:all' %}">Retour à la liste des sondages</a></p>
+```
