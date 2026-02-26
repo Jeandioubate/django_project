@@ -54,3 +54,24 @@ def all_polls(request):
         'questions': questions
     }
     return render(request, 'polls/all.html', context)
+
+def frequency(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+
+    choices = question.choice_set.all()
+    total_votes = sum(choice.votes for choice in choices)
+
+    results = []
+    for choice in choices:
+        if total_votes > 0:
+            percentage = (choice.votes / total_votes) * 100
+        else:
+            percentage = 0
+        results.append((choice, percentage))
+
+    context = {
+        'question': question,
+        'results': results,
+        'total_votes': total_votes,
+    }
+    return render(request, 'polls/frequency.html', context)
