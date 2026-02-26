@@ -1,10 +1,11 @@
 
 from django.db.models import F
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse
 from django.db.models import Sum, Max
+from .forms import QuestionForm
 
 from .models import Question, Choice
 # Create your views here.
@@ -106,3 +107,14 @@ def statistics(request):
         'last_question': last_question,
     }
     return render(request, 'polls/statistics.html', context)
+
+def create_question(request):
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('polls:index')
+    else:
+        form = QuestionForm()
+
+    return render(request, 'polls/create_question.html', {'form': form})
