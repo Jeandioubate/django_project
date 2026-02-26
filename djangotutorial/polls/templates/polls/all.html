@@ -1,0 +1,17 @@
+
+<h1>Liste de tous les sondages</h1>
+
+{% if questions %}
+    <ul>
+    {% for question in questions %}
+        <li>
+            {{ question.id }} —
+            <a href="{% url 'polls:detail' question.id %}">
+                {{ question.question_text }}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucun sondage disponible.</p>
+{% endif %}
