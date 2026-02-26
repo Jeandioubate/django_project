@@ -254,3 +254,78 @@ urlpatterns = [
     <p>Aucun sondage disponible.</p>
 {% endif %}
 ```
+#### 3. Dans cette même page http://127.0.0.1:8000/polls/all/, modifier le lien porté par chaque question pour aboutir à une page du type http://127.0.0.1:8000/polls/1/frequency/ affichant les résultats du sondage en valeur absolue et en pourcentage plutôt que le formulaire de vote.
+
+#### a. Ajouter l'URL frequency dans polls/urls.py
+```
+from django.urls import path
+
+from . import views
+
+app_name = "polls"
+urlpatterns = [
+    path("", views.IndexView.as_view(), name="index"),
+    path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+    path("<int:pk>/results/", views.ResultsView.as_view(), name="results"),
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+    path('all/', views.all_polls, name='all'),
+    path('<int:question_id>/frequency/', views.frequency, name='frequency'),
+]
+```
+#### b. Ajouter la vue frequency dans polls/views.py
+```
+from django.shortcuts import get_object_or_404, render
+from .models import Question
+
+
+def frequency(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+
+    choices = question.choice_set.all()
+    total_votes = sum(choice.votes for choice in choices)
+
+    results = []
+    for choice in choices:
+        if total_votes > 0:
+            percentage = (choice.votes / total_votes) * 100
+        else:
+            percentage = 0
+        results.append((choice, percentage))
+
+    context = {
+        'question': question,
+        'results': results,
+        'total_votes': total_votes,
+    }
+    return render(request, 'polls/frequency.html', context)
+```
+#### c. Créer le template polls/frequency.html
+```
+<h1>{{ question.question_text }}</h1>
+
+{% if results %}
+    <ul>
+    {% for choice, percentage in results %}
+        <li>
+            {{ choice.choice_text }} :
+            {{ choice.votes }} vote{{ choice.votes|pluralize }}
+            — {{ percentage|floatformat:2 }} %
+        </li>
+    {% endfor %}
+    </ul>
+    <p><strong>Total :</strong> {{ total_votes }} votes</p>
+{% else %}
+    <p>Aucun vote pour ce sondage.</p>
+{% endif %}
+
+<p><a href="{% url 'polls:all' %}">Retour à la liste des sondages</a></p>
+```
+#### d. Modifier les liens dans /polls/all/
+Dans polls/all.html, on remplace le lien
+```
+<a href="{% url 'polls:detail' question.id %}">
+```
+par:
+```
+<a href="{% url 'polls:frequency' question.id %}">
+```
