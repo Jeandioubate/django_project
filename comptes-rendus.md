@@ -202,3 +202,55 @@ Il est question de rajouter quelques fonctionnalités à l'application.
     <p>No polls are available.</p>
 {% endif %}
 ```
+#### 2. Ajoutez une page http://127.0.0.1:8000/polls/all/ qui liste tous les sondages avec leur numéro id et leur titre portant un lien vers leur page de détail.
+
+#### a. Ajouter la vue dans polls/views.py
+
+```
+from django.shortcuts import render
+from .models import Question
+
+
+def all_polls(request):
+    questions = Question.objects.all()
+    context = {
+        'questions': questions
+    }
+    return render(request, 'polls/all.html', context)
+```
+#### b. Ajouter l'URL /polls/all/ dans polls/urls.py
+
+```
+from django.urls import path
+
+from . import views
+
+app_name = "polls"
+urlpatterns = [
+    path("", views.IndexView.as_view(), name="index"),
+    path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+    path("<int:pk>/results/", views.ResultsView.as_view(), name="results"),
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+    path('all/', views.all_polls, name='all'),
+]
+```
+#### c. Créer un template polls/all.html
+
+```
+<h1>Liste de tous les sondages</h1>
+
+{% if questions %}
+    <ul>
+    {% for question in questions %}
+        <li>
+            {{ question.id }} —
+            <a href="{% url 'polls:detail' question.id %}">
+                {{ question.question_text }}
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucun sondage disponible.</p>
+{% endif %}
+```
