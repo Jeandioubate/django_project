@@ -184,4 +184,21 @@ q.was_published_recently()]
 >>> from django.contrib.auth.models import User
 >>> User.objects.all()
 ```
-
+# 3.2 Exercice parties (3 et 4)
+Il est question de rajouter quelques fonctionnalités à l'application.
+#### 1. Ajouter l'affichage de la date de publication du sondage dans le template *index.html*.
+```
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <li>
+            <a href="{% url 'polls:detail' question.id %}">
+                {{ question.question_text }}
+            </a>
+            <small>(publié le {{ question.pub_date|date:"d/m/Y à H:i" }})</small></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+```
