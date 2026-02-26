@@ -6,7 +6,7 @@
     {% for question in questions %}
         <li>
             {{ question.id }} —
-            <a href="{% url 'polls:detail' question.id %}">
+            <a href="{% url 'polls:frequency' question.id %}">
                 {{ question.question_text }}
             </a>
         </li>
