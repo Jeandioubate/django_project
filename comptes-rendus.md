@@ -496,3 +496,52 @@ urlpatterns = [
    </a>
 </p>
 ```
+#### 6. Enrichissez-le pour permettre de saisir les choix possibles de façon simplifiée, en prévoyant 5 champs de saisie de choix, seuls les n premiers champs saisis (non vide) étant alors pris en compte comme choix de la question.
+
+#### a. Modifier forms.py dans polls/forms.py, en ajoutant cinq champs supplémentaires.
+```
+from django import forms
+from .models import Question
+
+
+class QuestionForm(forms.ModelForm):
+
+    choice1 = forms.CharField(required=False, label="Choix 1")
+    choice2 = forms.CharField(required=False, label="Choix 2")
+    choice3 = forms.CharField(required=False, label="Choix 3")
+    choice4 = forms.CharField(required=False, label="Choix 4")
+    choice5 = forms.CharField(required=False, label="Choix 5")
+
+    class Meta:
+        model = Question
+        fields = ['question_text', 'pub_date']
+```
+#### b. Modifier la vue create_question dans polls/views.py.
+```
+def create_question(request):
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save()
+
+            choices = [
+                form.cleaned_data.get('choice1'),
+                form.cleaned_data.get('choice2'),
+                form.cleaned_data.get('choice3'),
+                form.cleaned_data.get('choice4'),
+                form.cleaned_data.get('choice5'),
+            ]
+
+            for choice_text in choices:
+                if choice_text:
+                    Choice.objects.create(
+                        question=question,
+                        choice_text=choice_text,
+                        votes=0
+                    )
+            return redirect('polls:index')
+    else:
+        form = QuestionForm()
+
+    return render(request, 'polls/create_question.html', {'form': form})
+```
