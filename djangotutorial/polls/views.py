@@ -112,7 +112,23 @@ def create_question(request):
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
-            form.save()
+            question = form.save()
+
+            choices = [
+                form.cleaned_data.get('choice1'),
+                form.cleaned_data.get('choice2'),
+                form.cleaned_data.get('choice3'),
+                form.cleaned_data.get('choice4'),
+                form.cleaned_data.get('choice5'),
+            ]
+
+            for choice_text in choices:
+                if choice_text:
+                    Choice.objects.create(
+                        question=question,
+                        choice_text=choice_text,
+                        votes=0
+                    )
             return redirect('polls:index')
     else:
         form = QuestionForm()
