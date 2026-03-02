@@ -4,6 +4,7 @@ import datetime
 from django.utils import timezone
 from django.db import models
 from django.db.models import Sum, Max, Min
+from django.contrib import admin
 
 
 class Question(models.Model):
@@ -15,6 +16,12 @@ class Question(models.Model):
 
     def __repr__(self):
         return "<Question: {}>".format(self.question_text)
+
+    @admin.display(
+        boolean=True,
+        ordering="pub_date",
+        description="Published recently?",
+    )
 
     def was_published_recently(self):
         now = timezone.now()
