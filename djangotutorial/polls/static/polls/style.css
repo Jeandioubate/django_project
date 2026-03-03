@@ -6,3 +6,7 @@ li a {
 body {
     background: white url("images/background.png") no-repeat;
 }
+
+form ul {
+    list-style-type: none;
+}
