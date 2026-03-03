@@ -150,22 +150,4 @@ def create_question(request):
     return render(request, 'polls/create_question.html', {'form': form})
 
 
-def vote(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    choices_form = [(choice.id, choice.choice_text)
-                    for choice in question.choice_set.all()]
-    if request.method == 'POST':
-        form = VoteForm(question.question_text,
-                        choices_form, request.POST)
-    if form.is_valid():
-        selected_choice = \
-        question.choice_set.get(pk=\
-                                form.cleaned_data['choice'])
-        selected_choice.votes += 1
-        selected_choice.save()
-        return HttpResponseRedirect(reverse('polls:results',
-                                    args=(question.id,)))
-    else:
-        form = VoteForm(question.question_text, choices_form)
-    return render(request, 'polls/detail.html',
-                  {'form': form, 'question': question})
+
