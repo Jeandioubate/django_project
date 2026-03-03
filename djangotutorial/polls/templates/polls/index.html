@@ -11,12 +11,6 @@
             <small>(publié le {{ question.pub_date|date:"d/m/Y à H:i" }})</small>
 
         </li>
-
-        <li>({{question.pub_date}}) :
-            <a href="{% url 'polls:vote' question.id %}">
-                {{ question.question_text }}
-            </a>
-        </li>
     {% endfor %}
     </ul>
 {% else %}
